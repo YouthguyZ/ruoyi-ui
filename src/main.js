@@ -79,7 +79,7 @@ Vue.use(Element, {
 Vue.config.productionTip = false
 
 new Vue({
-  el: '#app',
+  el: '#ppa',
   router,
   store,
   render: h => h(App)

@@ -41,7 +41,7 @@
           ></el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+          <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">查询</el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
         </el-form-item>
       </el-form>
@@ -55,8 +55,18 @@
             icon="el-icon-plus"
             size="mini"
             @click="handleAdd"
-            v-hasPermi="['system:logininfor:remove']"
+            v-hasPermi="['system:systemConfig:attachment:add']"
           >新增</el-button>
+        </el-col>
+        <el-col :span="1.5">
+          <el-button
+            type="success"
+            plain
+            icon="el-icon-edit"
+            size="mini"
+            @click="handleModify"
+            v-hasPermi="['system:systemConfig:attachment:edit']"
+          >修改</el-button>
         </el-col>
         <el-col :span="1.5">
           <el-button
@@ -66,18 +76,8 @@
             size="mini"
             :disabled="multiple"
             @click="handleDelete"
-            v-hasPermi="['system:logininfor:remove']"
+            v-hasPermi="['system:systemConfig:attachment:delete']"
           >删除</el-button>
-        </el-col>
-        <el-col :span="1.5">
-          <el-button
-            type="warning"
-            plain
-            icon="el-icon-edit"
-            size="mini"
-            @click="handleModify"
-            v-hasPermi="['system:logininfor:edit']"
-          >修改</el-button>
         </el-col>
         <!-- <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar> -->
       </el-row>
@@ -210,7 +210,7 @@ export default {
      * 重置
      */
     resetQuery() {
-      tthis.dateRange = [];
+      this.dateRange = [];
       this.resetForm("queryForm");
       this.queryParams.current = 1;
       this.$refs.tables.sort(this.defaultSort.prop, this.defaultSort.order)

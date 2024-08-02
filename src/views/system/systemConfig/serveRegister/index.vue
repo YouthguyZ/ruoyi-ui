@@ -58,7 +58,7 @@
             icon="el-icon-plus"
             size="mini"
             @click="handleAdd"
-            v-hasPermi="['system:logininfor:remove']"
+            v-hasPermi="['system:systemConfig:serveRegister:add']"
           >新增</el-button>
         </el-col>
         <el-col :span="1.5">
@@ -69,7 +69,7 @@
             size="mini"
             :disabled="single"
             @click="handleModify"
-            v-hasPermi="['system:logininfor:edit']"
+            v-hasPermi="['system:systemConfig:serveRegister:edit']"
           >修改</el-button>
         </el-col>
         <el-col :span="1.5">
@@ -80,7 +80,7 @@
             size="mini"
             :disabled="multiple"
             @click="handleDelete"
-            v-hasPermi="['system:logininfor:remove']"
+            v-hasPermi="['system:systemConfig:serveRegister:delete']"
           >删除</el-button>
         </el-col>
         
@@ -145,7 +145,7 @@
             <el-input v-model="dialog.form.loginName" placeholder="请输用户名"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="loginPass">
-            <el-input type="password" v-model="dialog.form.loginPass" placeholder="请输密码"></el-input>
+            <el-input type="password" v-model="dialog.form.loginPass" placeholder="请输密码" show-password></el-input>
           </el-form-item>
           <el-form-item label="服务ID" prop="serviceId">
             <el-input v-model="dialog.form.serviceId" placeholder="请输服务ID" disabled></el-input>

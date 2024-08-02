@@ -33,7 +33,7 @@
             icon="el-icon-plus"
             size="mini"
             @click="handleAdd"
-            v-hasPermi="['system:logininfor:remove']"
+            v-hasPermi="['system:systemConfig:sysSourceDef:add']"
           >新增</el-button>
         </el-col>
         <el-col :span="1.5">
@@ -44,7 +44,7 @@
             size="mini"
             :disabled="single"
             @click="handleUpdate"
-            v-hasPermi="['system:logininfor:edit']"
+            v-hasPermi="['system:systemConfig:sysSourceDef:edit']"
           >修改</el-button>
         </el-col>
         <el-col :span="1.5">
@@ -55,7 +55,7 @@
             size="mini"
             :disabled="multiple"
             @click="handleDelete"
-            v-hasPermi="['system:logininfor:remove']"
+            v-hasPermi="['system:systemConfig:sysSourceDef:delete']"
           >删除</el-button>
         </el-col>
       </el-row>

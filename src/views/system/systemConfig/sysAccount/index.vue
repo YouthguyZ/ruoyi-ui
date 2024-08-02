@@ -33,7 +33,7 @@
             style="width: 240px"
           >
             <el-option
-              v-for="dict in dict.type.sys_serve_register"
+              v-for="dict in dict.type.sys_account_dataflag"
               :key="dict.value"
               :label="dict.label"
               :value="dict.value"
@@ -47,7 +47,7 @@
             style="width: 240px"
           >
             <el-option
-              v-for="dict in dict.type.sys_serve_register"
+              v-for="dict in dict.type.sys_account_acctflag"
               :key="dict.value"
               :label="dict.label"
               :value="dict.value"
@@ -109,12 +109,12 @@
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="账户资料编号"  align="center" prop="dataId" />
         <el-table-column label="资料名称" align="center" prop="dataName" />
-        <el-table-column label="是否有实物" align="center" prop="dataFlag" />
+        <el-table-column label="是否有实物" align="center" prop="dataFlag" :formatter="formatdataFlag"/>
         <el-table-column label="备注" align="center" prop="note"/>
         <el-table-column label="新增修改时间" align="center" prop="updateTime" />
-        <el-table-column label="修改柜员" align="center" prop="updateOperid" />
-        <el-table-column label="对公对私标识" align="center" prop="accFlag" />
-        <el-table-column label="启用标识" align="center" prop="enableFlag" />
+        <el-table-column label="修改柜员" align="center" prop="updateOperId" />
+        <el-table-column label="对公对私标识" align="center" prop="acctFlag" :formatter="formatacctFlag"/>
+        <el-table-column label="启用标识" align="center" prop="enableFlag" :formatter="formatenableFlag"/>
       </el-table>
 
       <pagination
@@ -126,9 +126,9 @@
       />
       <!-- 添加或修改参数配置对话框 -->
       <el-dialog :title="dialog.title" :visible.sync="dialog.open" width="500px" center append-to-body>
-        <el-form ref="form" :model="dialog.form" :rules="dialog.rules" label-width="100px">
+        <el-form ref="form" :model="dialog.form" :rules="dialog.rules" label-width="110px">
           <el-form-item label="账户资料编号" prop="dataId">
-            <el-input v-model="dialog.form.dataId" />
+            <el-input v-model="dialog.form.dataId" :disabled="useFlag"/>
           </el-form-item>
           <el-form-item label="资料名称" prop="dataName">
             <el-input v-model="dialog.form.dataName" ></el-input>
@@ -140,7 +140,7 @@
               style="width: 100%"
             >
               <el-option
-                v-for="dict in dict.type.sys_source_def"
+                v-for="dict in dict.type.sys_account_dataflag"
                 :key="dict.value"
                 :label="dict.label"
                 :value="dict.value"
@@ -150,22 +150,22 @@
           <el-form-item label="备注" prop="note">
             <el-input v-model="dialog.form.note" />
           </el-form-item>
-          <el-form-item label="新增修改时间" prop="updateTime">
-            <el-input v-model="dialog.form.updateTime" />
-          </el-form-item>
+          <!-- <el-form-item label="新增修改时间" prop="updateTime">
+            <el-input v-model="dialog.form.updateTime" display="none"/>
+          </el-form-item> -->
           <el-form-item label="修改柜员" prop="updateOperId">
             <el-input v-model="dialog.form.updateOperId" />
           </el-form-item>
           <el-form-item label="对公对私标识" prop="acctFlag">
             <el-select
-              v-model="dialog.form.enableFlag"
+              v-model="dialog.form.acctFlag"
               clearable
               style="width: 100%"
             >
               <el-option
-                v-for="dict in serviceIds"
+                v-for="dict in dict.type.sys_account_acctflag"
                 :key="dict.value"
-                :label="dict.name"
+                :label="dict.label"
                 :value="dict.value"
               />
             </el-select>
@@ -177,9 +177,9 @@
               style="width: 100%"
             >
               <el-option
-                v-for="dict in serviceIds"
+                v-for="dict in dict.type.sys_account_enableflag"
                 :key="dict.value"
-                :label="dict.name"
+                :label="dict.label"
                 :value="dict.value"
               />
             </el-select>
@@ -195,20 +195,22 @@
 </template>
 
 <script>
-import { accountlist,addAccountList,updateAccountList,delAccountList} from "@/api/system/systemConfig/sysSourceDef.js";
+import { accountlist,addAccountList,updateAccountList,delAccountList} from "@/api/system/systemConfig/sysAccount.js";
 export default {
   name: "SysAccount",// 账户资料外系统配置
-  dicts: ["sys_source_def",],// 数据字典-系统来源类型
+  dicts: ["sys_account_dataflag","sys_account_acctflag","sys_account_enableflag"],// 数据字典-系统来源类型
   data() {
     return {
       // 遮罩层
       loading: true,
-      // 选中系统来源id数组
-      dataSourceIdList: [],
+      // 选中id数组
+      acctIdList: [],
       // 非单个禁用
       single: true,
       // 非多个禁用
       multiple: true,
+      // 账户资料编号不可修改 
+      useFlag:false,
       // 选择用户名
       selectName: "",
       // 显示搜索条件
@@ -238,22 +240,10 @@ export default {
           enableFlag: ""
         },
         rules:{
-          dataSourceType: [
-            { required: true, message: '此处不得为空', trigger: 'change' },
-          ],
-          groupName: [
-            { required: true, message: '此处不得为空', trigger: 'blur' }
-          ],
-          modeCode: [
-            { required: true, message: '此处不得为空', trigger: 'blur' }
-          ],
-          filePartName: [
-            { required: true, message: '此处不得为空', trigger: 'blur' }
-          ],
-          indexName: [
+          dataId: [
             { required: true, message: '此处不得为空', trigger: 'blur' },
           ],
-          custId: [
+          dataName: [
             { required: true, message: '此处不得为空', trigger: 'blur' }
           ],
         },
@@ -271,16 +261,31 @@ export default {
   },
 
   created() {
-    this.serviceIdQ()
     this.getList();
   },
 
   methods: {
-    formatId(row, column, cellValue, index) {
+    formatdataFlag(row, column, cellValue) {
       if (cellValue === '1') {
-        return '1-外系统';
-      }else if(cellValue === '0'){
-        return '0-本系统'
+        return '1-否';
+      }else if(cellValue === '2'){
+        return '2-是'
+      }
+      return cellValue;
+    },
+    formatacctFlag(row, column, cellValue) {
+      if (cellValue === '1') {
+        return '1-对公';
+      }else if(cellValue === '2'){
+        return '2-对私'
+      }
+      return cellValue;
+    },
+    formatenableFlag(row, column, cellValue) {
+      if (cellValue === '1') {
+        return '1-启用';
+      }else if(cellValue === '2'){
+        return '2-不启用'
       }
       return cellValue;
     },
@@ -293,16 +298,11 @@ export default {
     getList() {
       this.loading = true;
       let msg = {
-        "parameterList":[{
-          "dataId":"",
-          "dataName":"",
-          "dataFlag":"",
-          "acctFlag":"",
-        }],
-        "sysMap":{
-          "current":1,
-          "size":10
-        }
+        "dataId":this.queryParams.dataId,
+        "dataName":this.queryParams.dataName,
+        "dataFlag":this.queryParams.dataFlag,
+        "current":this.queryParams.current,
+        "size":this.queryParams.size
       }
       accountlist(msg).then(response => {
         if(response.code === 200){
@@ -331,14 +331,14 @@ export default {
     // 弹框表单重置
     dialogFormReset() {
       this.dialog.form = {
-        dataSourceType:'',
-        groupName:'',
-        modeCode:'',
-        filePartName:'',
-        indexName:'',
-        custId:'',
-        dataDesc:'',
-        serviceId:'',
+        dataId: "",
+        dataName: "",
+        dataFlag: "",
+        note: "",
+        updateTime: "",
+        updateOperId: "",
+        acctFlag: "",
+        enableFlag: ""
       };
       this.resetForm("form");
     },
@@ -346,7 +346,7 @@ export default {
     handleSelectionChange(selection) {
       console.log(selection,'多行数据选中');
       this.row = selection
-      this.dataSourceIdList = selection.map(item => item.dataSourceId)
+      this.acctIdList = selection.map(item => item.id)
       this.single = selection.length!=1
       this.multiple = !selection.length
     },
@@ -362,15 +362,16 @@ export default {
      */
     handleAdd(){
       this.dialogFormReset()
+      this.useFlag = false,
       this.dialog.open = true
       this.dialog.title = "新增";
     },
     
     /** 删除按钮操作 */
     handleDelete() {
-      console.log(this.dataSourceIdList,'del');
+      console.log(this.acctIdList,'del');
       let delMsg = {
-       "dataSourceIdList": this.dataSourceIdList
+       "idList": this.acctIdList
       };
       this.$modal.confirm('是否确认删除选中数据？')
       .then(function(){
@@ -395,16 +396,16 @@ export default {
     handleUpdate() {
       this.dialogFormReset()
       this.dialog.form = {
-        dataSourceId:this.row[0].dataSourceId,
-        groupName:this.row[0].groupName,
-        modeCode:this.row[0].modeCode,
-        indexName:this.row[0].indexName,
-        filePartName:this.row[0].filePartName,
-        dataDesc:this.row[0].dataDesc,
-        custId:this.row[0].custId,
-        serviceId:this.row[0].serviceId,
-        dataSourceType:this.row[0].dataSourceType,
+        dataId:this.row[0].dataId,
+        dataName:this.row[0].dataName,
+        dataFlag:this.row[0].dataFlag,
+        note:this.row[0].note,
+        updateTime:this.row[0].updateTime,
+        acctFlag:this.row[0].acctFlag,
+        enableFlag:this.row[0].enableFlag,
+        updateOperId:this.row[0].updateOperId,
       }
+      this.useFlag = true,
       this.dialog.open = true
       this.dialog.title = "修改";
     },
@@ -419,17 +420,16 @@ export default {
         if (valid) {
           if (this.dialog.title !== '新增') {
            let updateMsg = {
-              parameterList:[{
-                dataSourceId:this.dialog.form.dataSourceId,
-                groupName:this.dialog.form.groupName,
-                modeCode:this.dialog.form.modeCode,
-                indexName:this.dialog.form.indexName,
-                filePartName:this.dialog.form.filePartName,
-                dataDesc:this.dialog.form.dataDesc,
-                custId:this.dialog.form.custId,
-                serviceId:this.dialog.form.serviceId,
-                dataSourceType:this.dialog.form.dataSourceType,
-              }],
+              id:this.row[0].id,
+              dataId:this.dialog.form.dataId,
+              dataName:this.dialog.form.dataName,
+              dataFlag:this.dialog.form.dataFlag,
+              note:this.dialog.form.note,
+              updateTime:this.dialog.form.updateTime,
+              acctFlag:this.dialog.form.acctFlag,
+              enableFlag:this.dialog.form.enableFlag,
+              updateOperId:this.dialog.form.updateOperId,
+              
             }
             updateAccountList(updateMsg).then(response => {
               this.$modal.msgSuccess("修改成功");
@@ -438,16 +438,14 @@ export default {
             });
           } else { // 新增接口
             let msg = {
-              parameterList:[{
-                groupName:this.dialog.form.groupName,
-                modeCode:this.dialog.form.modeCode,
-                indexName:this.dialog.form.indexName,
-                filePartName:this.dialog.form.filePartName,
-                dataDesc:this.dialog.form.dataDesc,
-                custId:this.dialog.form.custId,
-                serviceId:this.dialog.form.serviceId,
-                dataSourceType:this.dialog.form.dataSourceType,
-              }],
+              dataId:this.dialog.form.dataId,
+              dataName:this.dialog.form.dataName,
+              dataFlag:this.dialog.form.dataFlag,
+              note:this.dialog.form.note,
+              updateTime:this.dialog.form.updateTime,
+              acctFlag:this.dialog.form.acctFlag,
+              enableFlag:this.dialog.form.enableFlag,
+              updateOperId:this.dialog.form.updateOperId,
             }
             addAccountList(msg).then(response => {
               console.log(response,'res');

@@ -65,6 +65,7 @@ export function addDateRange(params, dateRange, propName) {
     search.params['begin' + propName] = dateRange[0];
     search.params['end' + propName] = dateRange[1];
   }
+  console.log(search,'search');
   return search;
 }
 

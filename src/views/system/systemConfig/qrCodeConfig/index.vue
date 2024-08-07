@@ -46,11 +46,12 @@
           <el-date-picker
             v-model="dateRange"
             style="width: 240px"
-            value-format="yyyyMMdd"
+            value-format="yyyy-MM-dd HH:mm:ss"
             type="daterange"
             range-separator="-"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
+            :default-time="['00:00:00', '23:59:59']"
           ></el-date-picker>
         </el-form-item>
         <el-form-item>
@@ -223,8 +224,8 @@ export default {
         voucherType:"",
         locationx:"",
         locationy:"",
-        beginTime:"", // this.dateRange[0]?this.dateRange[0]:
-        endTime:"" // this.dateRange[1]?this.dateRange[1]:
+        beginTime:"", 
+        endTime:"" 
       }
     };
   },
@@ -234,6 +235,18 @@ export default {
   },
 
   methods: {
+    // 查询项时间
+    formatDate(queryParams,dateRange){
+      if(dateRange.length==0){
+        queryParams.beginTime = ''
+        queryParams.endTime = ''
+        return queryParams
+      }else{
+        queryParams.beginTime = dateRange[0]
+        queryParams.endTime = dateRange[1]
+        return queryParams
+      }
+    },
     formatdataFlag(row, column, cellValue) {
       if (cellValue === '1') {
         return '1-否';
@@ -251,17 +264,17 @@ export default {
     getList() {
       console.log(this.dateRange,'daterange');
       this.loading = true;
-      let msg = {
-        "sysName":this.queryParams.sysName,
-        "voucherType":this.queryParams.voucherType,
-        "locationx":this.queryParams.locationx,
-        "locationy":this.queryParams.locationy,
-        "beginTime":this.queryParams.beginTime,
-        "endTime":this.queryParams.endTime,
-        "current":this.queryParams.current,
-        "size":this.queryParams.size
-      }
-      qrCodeList(msg).then(response => {
+      // let msg = {
+      //   "sysName":this.queryParams.sysName,
+      //   "voucherType":this.queryParams.voucherType,
+      //   "locationx":this.queryParams.locationx,
+      //   "locationy":this.queryParams.locationy,
+      //   "beginTime":this.queryParams.beginTime,
+      //   "endTime":this.queryParams.endTime,
+      //   "current":this.queryParams.current,
+      //   "size":this.queryParams.size
+      // }
+      qrCodeList(this.formatDate(this.queryParams,this.dateRange)).then(response => {
         if(response.code === 200){
           console.log(response,'res');
           this.list = response.data.records;
@@ -282,6 +295,7 @@ export default {
      * 重置
      */
     resetQuery() {
+      this.dateRange = []
       this.$refs.queryForm.resetFields();
       this.getList()
     },

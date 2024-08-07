@@ -34,7 +34,7 @@ const permission = {
       return new Promise(resolve => {
         // 向后端请求路由数据
         getRouters().then(res => {
-          console.log(res,'res--getrouters');
+          // console.log(res,'res--getrouters');
           const sdata = JSON.parse(JSON.stringify(res.data))
           const rdata = JSON.parse(JSON.stringify(res.data))
           const sidebarRoutes = filterAsyncRouter(sdata)
@@ -56,7 +56,7 @@ const permission = {
 // 遍历后台传来的路由字符串，转换为组件对象
 function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
   return asyncRouterMap.filter(route => {
-    console.log(route,'route--permission');
+    // console.log(route,'route--permission');
     if (type && route.children) {
       route.children = filterChildren(route.children)
     }
